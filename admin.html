@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Panel</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light">
+
+  <!-- LOGIN -->
+  <div id="login-screen" style="display:flex; align-items:center; justify-content:center; min-height:100vh;">
+    <div class="card shadow p-4" style="width:360px">
+      <h4 class="text-center mb-4">🔐 Admin Panel</h4>
+      <input type="password" id="admin-password" class="form-control mb-3" placeholder="Parolni kiriting">
+      <button class="btn btn-danger w-100" onclick="adminLogin()">Kirish</button>
+      <p id="login-error" class="text-danger text-center mt-2" style="display:none">Parol noto'g'ri!</p>
+    </div>
+  </div>
+
+  <!-- ADMIN PANEL -->
+  <div id="admin-panel" style="display:none">
+    <nav class="navbar navbar-dark bg-danger">
+      <div class="container">
+        <span class="navbar-brand fw-bold">🍽️ Admin Panel</span>
+        <div class="d-flex gap-2">
+          <a href="/" class="btn btn-outline-light btn-sm">Menyu sahifasi</a>
+          <button class="btn btn-outline-light btn-sm" onclick="adminLogout()">Chiqish</button>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container py-4">
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <button class="nav-link active" onclick="showTab('menu-tab', this)">🍜 Taomlar</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link" onclick="showTab('orders-tab', this)">📦 Buyurtmalar</button>
+        </li>
+      </ul>
+
+      <div id="menu-tab">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Barcha taomlar</h5>
+          <button class="btn btn-danger" onclick="openAddModal()">+ Taom qo'shish</button>
+        </div>
+        <div id="admin-menu-list" class="row g-3"></div>
+      </div>
+
+      <div id="orders-tab" style="display:none">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Barcha buyurtmalar</h5>
+          <button class="btn btn-outline-secondary btn-sm" onclick="loadOrders()">🔄 Yangilash</button>
+        </div>
+        <div id="orders-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL -->
+  <div class="modal fade" id="menuModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-title">Taom qo'shish</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <input type="hidden" id="edit-id">
+          <div class="mb-3">
+            <label class="form-label">Nomi *</label>
+            <input type="text" id="f-name" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Tavsif *</label>
+            <textarea id="f-desc" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Narxi (so'm) *</label>
+            <input type="number" id="f-price" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Kategoriya *</label>
+            <select id="f-category" class="form-select">
+              <option value="Asosiy taomlar">Asosiy taomlar</option>
+              <option value="Salatlar">Salatlar</option>
+              <option value="Ichimliklar">Ichimliklar</option>
+              <option value="Shirinliklar">Shirinliklar</option>
+              <option value="Snacklar">Snacklar</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Rasm URL</label>
+            <input type="text" id="f-image" class="form-control">
+          </div>
+          <div class="form-check">
+            <input type="checkbox" id="f-available" class="form-check-input" checked>
+            <label class="form-check-label">Mavjud</label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn btn-secondary" data-bs-dismiss="modal">Bekor</button>
+          <button class="btn btn-danger" onclick="saveMenuItem()">Saqlash</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="./js/admin.js"></script>
+</body>
+</html>
