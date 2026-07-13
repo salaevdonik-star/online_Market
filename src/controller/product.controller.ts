@@ -323,7 +323,6 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
   }
 };
 
-// POST /products/:id/reviews
 export const addReview = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = getParam(req.params.id, "id");

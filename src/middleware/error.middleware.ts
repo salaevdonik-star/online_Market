@@ -23,7 +23,6 @@ export default function errorMiddleware(err: any, req: Request, res: Response, n
       });
     }
 
-    // Prisma known errors (unique constraint, not found, etc.)
     if (err.code === "P2002") {
       logger.warn("Unique constraint violation: " + JSON.stringify(err.meta), meta);
       return res.status(400).json({

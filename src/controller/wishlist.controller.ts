@@ -54,7 +54,6 @@ export const removeFromWishlist = async (req: Request, res: Response, next: Next
   }
 };
 
-// Wishlist page - "Move All To Bag"
 export const moveAllToCart = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const wishlistItems = await prisma.wishlistItem.findMany({
@@ -67,8 +66,8 @@ export const moveAllToCart = async (req: Request, res: Response, next: NextFunct
           user_id_product_id_color_size: {
             user_id: req.user!.id,
             product_id: item.product_id,
-            color: null as any,
-            size: null as any,
+            color: "",
+            size: "",
           },
         },
         update: { quantity: { increment: 1 } },

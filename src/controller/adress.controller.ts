@@ -50,10 +50,23 @@ export const updateAddress = async (req: Request, res: Response, next: NextFunct
     if (!foundedAddress || foundedAddress.user_id !== req.user!.id) {
       throw CustomErrorHandler.NotFound("Address not found");
     }
+    const { first_name, last_name, company, street, apartment, city, phone, email, is_default } =
+      req.body;
+
+    const updateData: any = {};
+    if (first_name !== undefined) updateData.first_name = first_name;
+    if (last_name !== undefined) updateData.last_name = last_name;
+    if (company !== undefined) updateData.company = company;
+    if (street !== undefined) updateData.street = street;
+    if (apartment !== undefined) updateData.apartment = apartment;
+    if (city !== undefined) updateData.city = city;
+    if (phone !== undefined) updateData.phone = phone;
+    if (email !== undefined) updateData.email = email;
+    if (is_default !== undefined) updateData.is_default = is_default === "true" || is_default === true;
 
     const address = await prisma.address.update({
       where: { id },
-      data: req.body,
+      data: updateData,
     });
 
     res.status(200).json({ message: "Address updated", address });

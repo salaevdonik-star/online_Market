@@ -10,7 +10,6 @@ import { productImages } from "../config/multer";
 
 const productRouter = Router();
 
-// Home page sections
 productRouter.get("/products/explore", getAllProducts);
 productRouter.get("/products/flash-sale", getFlashSaleProducts);
 productRouter.get("/products/best-selling", getBestSellingProducts);
@@ -19,21 +18,19 @@ productRouter.get("/products/new-arrival", getNewArrivalProducts);
 productRouter.get("/products/search", search);
 productRouter.get("/products/category/:category_id", getProductsByCategory);
 
-// Product detail page
 productRouter.get("/products/:slug", getOneProduct);
 productRouter.get("/products/:slug/related", getRelatedProducts);
 productRouter.post("/products/:id/reviews", authorization, validateMiddleware(reviewValidator), addReview);
 
-// Admin CRUD
 productRouter.post(
   "/products",
-  productImages,
   authorization,
   adminChecker,
+  productImages,
   validateMiddleware(productValidator),
   addProduct
 );
-productRouter.put("/products/:id", productImages, authorization, adminChecker, updateProduct);
+productRouter.put("/products/:id", authorization, adminChecker, productImages, updateProduct);
 productRouter.delete("/products/:id", authorization, adminChecker, deleteProduct);
 
 export default productRouter;

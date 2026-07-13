@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Request, Response, NextFunction } from "express";
-import sendEmail from "../utils/email-sender";
+import { sendPlainEmail } from "../utils/email-sender";
 import CustomErrorHandler from "../error/error";
 
 const contactRouter = Router();
@@ -13,9 +13,10 @@ contactRouter.post("/contact", async (req: Request, res: Response, next: NextFun
       throw CustomErrorHandler.BadRequest("Name, email va phone shart");
     }
 
-    await sendEmail(
+    await sendPlainEmail(
       process.env.GOOGLE_EMAIL as string,
-      `From: ${name} (${email}, ${phone})\n\n${message ?? ""}`
+      `Yangi xabar: ${name}`,
+      `Ism: ${name}\nEmail: ${email}\nTelefon: ${phone}\n\nXabar:\n${message ?? ""}`
     );
 
     res.status(200).json({ message: "Message sent" });

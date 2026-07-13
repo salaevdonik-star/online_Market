@@ -9,7 +9,6 @@ const COUPONS: Record<string, number> = {
   SALE20: 20,
 };
 
-// POST /coupons/apply
 export const applyCoupon = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { code } = req.body;
@@ -26,7 +25,6 @@ export const applyCoupon = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// POST /orders  (Checkout page - "Place Order")
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const {
@@ -49,6 +47,14 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
 
     if (cartItems.length === 0) {
       throw CustomErrorHandler.BadRequest("Cart is empty");
+    }
+
+    for (const item of cartItems) {
+      if (item.product.stock < item.quantity) {
+        throw CustomErrorHandler.BadRequest(
+          `"${item.product.name}" uchun yetarli stock yo'q (mavjud: ${item.product.stock}, so'ralgan: ${item.quantity})`
+        );
+      }
     }
 
     const subtotal = cartItems.reduce(
@@ -97,6 +103,13 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         include: { items: true },
       });
 
+      for (const item of cartItems) {
+        await tx.product.update({
+          where: { id: item.product_id },
+          data: { stock: { decrement: item.quantity } },
+        });
+      }
+
       await tx.cartItem.deleteMany({ where: { user_id: req.user!.id } });
 
       return created;
@@ -108,7 +121,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// GET /orders (My Account - My Orders)
 export const getMyOrders = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const orders = await prisma.order.findMany({
@@ -142,7 +154,6 @@ export const getOneOrder = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// PATCH /orders/:id/cancel (My Account - My Cancellations)
 export const cancelOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = getParam(req.params.id, "id");
@@ -157,9 +168,20 @@ export const cancelOrder = async (req: Request, res: Response, next: NextFunctio
       throw CustomErrorHandler.BadRequest("Completed orders cannot be cancelled");
     }
 
-    const updated = await prisma.order.update({
-      where: { id },
-      data: { status: "cancelled" },
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const items = await tx.orderItem.findMany({ where: { order_id: id } });
+
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.product_id },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+
+      return tx.order.update({
+        where: { id },
+        data: { status: "cancelled" },
+      });
     });
 
     res.status(200).json({ message: "Order cancelled", order: updated });
@@ -168,7 +190,6 @@ export const cancelOrder = async (req: Request, res: Response, next: NextFunctio
   }
 };
 
-// PATCH /orders/:id/return (My Account - My Returns)
 export const returnOrder = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const id = getParam(req.params.id, "id");
@@ -183,9 +204,21 @@ export const returnOrder = async (req: Request, res: Response, next: NextFunctio
       throw CustomErrorHandler.BadRequest("Only completed orders can be returned");
     }
 
-    const updated = await prisma.order.update({
-      where: { id },
-      data: { status: "returned" },
+    const updated = await prisma.$transaction(async (tx: Prisma.TransactionClient) => {
+      const items = await tx.orderItem.findMany({ where: { order_id: id } });
+
+      // Qaytarilgan buyurtma uchun ham stockni tiklaymiz.
+      for (const item of items) {
+        await tx.product.update({
+          where: { id: item.product_id },
+          data: { stock: { increment: item.quantity } },
+        });
+      }
+
+      return tx.order.update({
+        where: { id },
+        data: { status: "returned" },
+      });
     });
 
     res.status(200).json({ message: "Order marked as returned", order: updated });

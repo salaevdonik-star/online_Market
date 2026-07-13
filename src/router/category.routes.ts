@@ -11,8 +11,8 @@ const categoryRouter = Router();
 categoryRouter.get("/get_all_categories", getAllCategories);
 categoryRouter.get("/get_one_category/:id", getOneCategory);
 categoryRouter.get("/search_category", search);
-categoryRouter.post("/add_category", categoryIcon, authorization, adminChecker, validateMiddleware(categoryValidator), addCategory);
-categoryRouter.put("/update_category/:id", categoryIcon, authorization, adminChecker, updateCategory);
+categoryRouter.post("/add_category", authorization, adminChecker, categoryIcon, validateMiddleware(categoryValidator), addCategory);
+categoryRouter.put("/update_category/:id", authorization, adminChecker, categoryIcon, updateCategory);
 categoryRouter.delete("/delete_category/:id", authorization, adminChecker, deleteCategory);
 
 export default categoryRouter;

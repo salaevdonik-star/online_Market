@@ -1,12 +1,5 @@
 import { Router } from "express";
-import {
-  applyCoupon,
-  createOrder,
-  getMyOrders,
-  getOneOrder,
-  cancelOrder,
-  returnOrder,
-} from "../controller/order.controller";
+import { applyCoupon, createOrder, getMyOrders, getOneOrder, cancelOrder, returnOrder } from "../controller/order.controller";
 import validateMiddleware from "../middleware/validate.middleware";
 import orderValidator from "../validator/order.validator";
 import authorization from "../middleware/authorization";
